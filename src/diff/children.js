@@ -45,7 +45,7 @@ export function diffChildren(
 	let childVNode;
 
 	let oldChildren =
-		(parentInternal._children && parentInternal._children.slice()) || EMPTY_ARR;
+		(parentInternal.children && parentInternal.children.slice()) || EMPTY_ARR;
 	let oldChildrenLength = oldChildren.length;
 
 	const newChildren = [];
@@ -84,11 +84,11 @@ export function diffChildren(
 		// If this node suspended during hydration, and no other flags are set:
 		// @TODO: might be better to explicitly check for MODE_ERRORED here.
 		else if (
-			(childInternal._flags & (MODE_HYDRATE | MODE_SUSPENDED)) ===
+			(childInternal.flags & (MODE_HYDRATE | MODE_SUSPENDED)) ===
 			(MODE_HYDRATE | MODE_SUSPENDED)
 		) {
 			// We are resuming the hydration of a VNode
-			startDom = childInternal._dom;
+			startDom = childInternal.dom;
 			oldVNodeRef = childInternal.ref;
 
 			nextDomSibling = mount(
@@ -113,19 +113,19 @@ export function diffChildren(
 			);
 		}
 
-		newDom = childInternal._dom;
+		newDom = childInternal.dom;
 
 		if (childVNode.ref) {
 			if (!refs) refs = [];
 			refs.push(
 				oldVNodeRef,
 				childVNode.ref,
-				childInternal._component || newDom,
+				childInternal.component || newDom,
 				childInternal
 			);
 		}
 
-		if (childInternal._flags & TYPE_COMPONENT) {
+		if (childInternal.flags & TYPE_COMPONENT) {
 			startDom = nextDomSibling;
 		} else if (newDom && newDom == startDom) {
 			// If the newDom and the dom we are expecting to be there are the same, then
@@ -146,13 +146,13 @@ export function diffChildren(
 		newChildren[i] = childInternal;
 	}
 
-	parentInternal._children = newChildren;
+	parentInternal.children = newChildren;
 
 	// Remove remaining oldChildren if there are any.
 	for (i = oldChildrenLength; i--; ) {
 		if (oldChildren[i] != null) {
 			if (
-				parentInternal._flags & TYPE_COMPONENT &&
+				parentInternal.flags & TYPE_COMPONENT &&
 				startDom != null &&
 				((oldChildren[i]._flags & TYPE_DOM &&
 					oldChildren[i]._dom == startDom) ||
@@ -193,7 +193,7 @@ function findMatchingInternal(childVNode, oldChildren, i, oldChildrenLength) {
 
 	if (typeof childVNode === 'string') {
 		// We never move Text nodes, so we only check for an in-place match:
-		if (childInternal && childInternal._flags & TYPE_TEXT) {
+		if (childInternal && childInternal.flags & TYPE_TEXT) {
 			oldChildren[i] = UNDEFINED;
 		} else {
 			// We're looking for a Text node, but this wasn't one: ignore it
@@ -234,28 +234,28 @@ function findMatchingInternal(childVNode, oldChildren, i, oldChildrenLength) {
  * @param {import('../internal').PreactElement} parentDom
  */
 export function reorderChildren(internal, startDom, parentDom) {
-	if (internal._children == null) {
+	if (internal.children == null) {
 		return startDom;
 	}
 
-	for (let tmp = 0; tmp < internal._children.length; tmp++) {
-		let childInternal = internal._children[tmp];
+	for (let tmp = 0; tmp < internal.children.length; tmp++) {
+		let childInternal = internal.children[tmp];
 		if (childInternal) {
 			// We typically enter this code path on sCU bailout, where we copy
 			// oldVNode._children to newVNode._children. If that is the case, we need
 			// to update the old children's _parent pointer to point to the newVNode
 			// (childVNode here).
-			childInternal._parent = internal;
+			childInternal.parent = internal;
 
-			if (childInternal._flags & TYPE_COMPONENT) {
+			if (childInternal.flags & TYPE_COMPONENT) {
 				startDom = reorderChildren(childInternal, startDom, parentDom);
-			} else if (childInternal._dom == startDom) {
+			} else if (childInternal.dom == startDom) {
 				startDom = startDom.nextSibling;
 			} else {
 				startDom = placeChild(
 					parentDom,
-					internal._children.length,
-					childInternal._dom,
+					internal.children.length,
+					childInternal.dom,
 					startDom
 				);
 			}

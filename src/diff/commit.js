@@ -5,11 +5,11 @@ import options from '../options';
  * @param {() => void} callback
  */
 export function addCommitCallback(internal, callback) {
-	if (internal._commitCallbacks == null) {
-		internal._commitCallbacks = [];
+	if (internal.commitCallbacks == null) {
+		internal.commitCallbacks = [];
 	}
 
-	internal._commitCallbacks.push(callback);
+	internal.commitCallbacks.push(callback);
 }
 
 /**
@@ -26,7 +26,7 @@ export function commitRoot(commitQueue, rootInternal) {
 			commitQueue = internal._commitCallbacks.length;
 			// @ts-ignore See above ts-ignore comment
 			while (commitQueue--) {
-				internal._commitCallbacks.shift().call(internal._component);
+				internal.commitCallbacks.shift().call(internal.component);
 			}
 		} catch (e) {
 			options._catchError(e, internal);

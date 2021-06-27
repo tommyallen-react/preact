@@ -25,7 +25,7 @@ export function createInternal(vnode, parentInternal) {
 		ref;
 
 	/** @type {number} */
-	let flags = parentInternal ? parentInternal._flags & INHERITED_MODES : 0;
+	let flags = parentInternal ? parentInternal.flags & INHERITED_MODES : 0;
 
 	// Text VNodes/Internals use NaN as an ID so that two are never equal.
 	let vnodeId = NaN;
@@ -70,7 +70,7 @@ export function createInternal(vnode, parentInternal) {
 			flags |= MODE_SVG;
 		} else if (
 			parentInternal &&
-			parentInternal._flags & MODE_SVG &&
+			parentInternal.flags & MODE_SVG &&
 			parentInternal.type === 'foreignObject'
 		) {
 			flags &= ~MODE_SVG;
@@ -83,13 +83,13 @@ export function createInternal(vnode, parentInternal) {
 		props,
 		key,
 		ref,
-		_children: null,
-		_parent: parentInternal,
-		_vnodeId: vnodeId,
-		_dom: null,
-		_component: null,
-		_flags: flags,
-		_depth: parentInternal ? parentInternal._depth + 1 : 0
+		children: null,
+		parent: parentInternal,
+		id: vnodeId,
+		dom: null,
+		component: null,
+		flags: flags,
+		depth: parentInternal ? parentInternal.depth + 1 : 0
 	};
 
 	if (options._internal) options._internal(internal, vnode);
@@ -111,8 +111,8 @@ export function getDomSibling(internal, childIndex) {
 	if (childIndex == null) {
 		// Use childIndex==null as a signal to resume the search from the vnode's sibling
 		return getDomSibling(
-			internal._parent,
-			internal._parent._children.indexOf(internal) + 1
+			internal.parent,
+			internal.parent.children.indexOf(internal) + 1
 		);
 	}
 
@@ -127,7 +127,7 @@ export function getDomSibling(internal, childIndex) {
 	// VNode (meaning we reached the DOM parent of the original vnode that began
 	// the search). Note, the top of the tree has _parent == null so avoiding that
 	// here.
-	return internal._parent && shouldSearchComponent(internal)
+	return internal.parent && shouldSearchComponent(internal)
 		? getDomSibling(internal)
 		: null;
 }
@@ -138,15 +138,15 @@ export function getDomSibling(internal, childIndex) {
  * @returns {import('./internal').PreactElement}
  */
 export function getChildDom(internal, i) {
-	if (internal._children == null) {
+	if (internal.children == null) {
 		return null;
 	}
 
-	for (i = i || 0; i < internal._children.length; i++) {
-		let child = internal._children[i];
+	for (i = i || 0; i < internal.children.length; i++) {
+		let child = internal.children[i];
 		if (child != null) {
-			if (child._flags & TYPE_DOM) {
-				return child._dom;
+			if (child.flags & TYPE_DOM) {
+				return child.dom;
 			}
 
 			if (shouldSearchComponent(child)) {
@@ -167,17 +167,17 @@ export function getChildDom(internal, i) {
  */
 export function getParentDom(internal) {
 	let parentDom =
-		internal._flags & TYPE_ROOT ? internal.props._parentDom : null;
+		internal.flags & TYPE_ROOT ? internal.props._parentDom : null;
 
-	let parent = internal._parent;
+	let parent = internal.parent;
 	while (parentDom == null && parent) {
-		if (parent._flags & TYPE_ROOT) {
+		if (parent.flags & TYPE_ROOT) {
 			parentDom = parent.props._parentDom;
-		} else if (parent._flags & TYPE_ELEMENT) {
-			parentDom = parent._dom;
+		} else if (parent.flags & TYPE_ELEMENT) {
+			parentDom = parent.dom;
 		}
 
-		parent = parent._parent;
+		parent = parent.parent;
 	}
 
 	return parentDom;

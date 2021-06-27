@@ -130,24 +130,24 @@ export interface Internal<P = {}> {
 	key: any;
 	ref: Ref<any> | null;
 	/** children Internal nodes */
-	_children: Internal[];
+	children: Internal[];
 	/** next sibling Internal node */
-	_parent: Internal;
+	parent: Internal;
 	/** most recent vnode ID */
-	_vnodeId: number;
+	id: number;
 	/**
 	 * Associated DOM element for the Internal, or its nearest realized descendant.
 	 * For Fragments, this is the first DOM child.
 	 */
-	_dom: PreactNode;
+	dom: PreactNode;
 	/** The component instance for which this is a backing Internal node */
-	_component: Component | null;
+	component: Component | null;
 	/** Bitfield containing information about the Internal or its component. */
-	_flags: number;
+	flags: number;
 	/** This Internal's distance from the tree root */
-	_depth: number | null;
+	depth: number | null;
 	/** Callbacks to invoke when this internal commits */
-	_commitCallbacks: Array<() => void>;
+	commitCallbacks: Array<() => void>;
 }
 
 export interface Component<P = {}, S = {}> extends preact.Component<P, S> {

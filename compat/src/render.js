@@ -69,8 +69,8 @@ export function render(vnode, parent, callback) {
 	preactRender(vnode, parent);
 	if (typeof callback == 'function') callback();
 
-	const internal = parent._children._children[0];
-	return internal ? internal._component : null;
+	const internal = parent._children.children[0];
+	return internal ? internal.component : null;
 }
 
 export function hydrate(vnode, parent, callback) {
@@ -214,7 +214,7 @@ options._render = function(internal) {
 	if (oldBeforeRender) {
 		oldBeforeRender(internal);
 	}
-	currentComponent = internal._component;
+	currentComponent = internal.component;
 };
 
 // This is a very very private internal function for React it

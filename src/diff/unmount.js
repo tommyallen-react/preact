@@ -15,14 +15,14 @@ export function unmount(internal, parentInternal, skipRemove) {
 	let r,
 		i = 0;
 	if (options.unmount) options.unmount(internal);
-	internal._flags |= MODE_UNMOUNTING;
+	internal.flags |= MODE_UNMOUNTING;
 
 	if ((r = internal.ref)) {
-		if (!r.current || r.current === internal._dom)
+		if (!r.current || r.current === internal.dom)
 			applyRef(null, r, null, parentInternal);
 	}
 
-	if ((r = internal._component)) {
+	if ((r = internal.component)) {
 		unsubscribeFromContext(r);
 
 		if (r.componentWillUnmount) {
@@ -34,21 +34,21 @@ export function unmount(internal, parentInternal, skipRemove) {
 		}
 	}
 
-	if ((r = internal._children)) {
+	if ((r = internal.children)) {
 		for (; i < r.length; i++) {
 			if (r[i]) {
 				unmount(
 					r[i],
 					parentInternal,
-					skipRemove ? ~internal._flags & TYPE_ROOT : internal._flags & TYPE_DOM
+					skipRemove ? ~internal.flags & TYPE_ROOT : internal.flags & TYPE_DOM
 				);
 			}
 		}
 	}
 
-	if (!skipRemove && internal._flags & TYPE_DOM) {
-		internal._dom.remove();
+	if (!skipRemove && internal.flags & TYPE_DOM) {
+		internal.dom.remove();
 	}
 
-	internal._dom = null;
+	internal.dom = null;
 }

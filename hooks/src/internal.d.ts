@@ -8,7 +8,7 @@ import { Reducer } from '.';
 export { PreactContext };
 
 export type Internal = PreactInternal & {
-	_component: Component;
+	component: Component;
 };
 
 /**

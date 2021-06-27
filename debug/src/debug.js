@@ -127,7 +127,7 @@ export function initDebug() {
 			);
 		}
 
-		let { type, _parent: parent } = internal;
+		let { type, parent } = internal;
 
 		if (type === undefined) {
 			throw new Error(
@@ -346,10 +346,10 @@ export function initDebug() {
 
 		if (oldDiffed) oldDiffed(vnode);
 
-		if (vnode._children != null) {
+		if (vnode.children != null) {
 			const keys = [];
-			for (let i = 0; i < vnode._children.length; i++) {
-				const child = vnode._children[i];
+			for (let i = 0; i < vnode.children.length; i++) {
+				const child = vnode.children[i];
 				if (!child || child.key == null) continue;
 
 				const key = child.key;
@@ -390,7 +390,7 @@ Component.prototype.setState = function(update, callback) {
 					)}`
 			);
 		}
-	} else if (this._internal._flags & MODE_UNMOUNTING) {
+	} else if (this._internal.flags & MODE_UNMOUNTING) {
 		console.warn(
 			`Can't call "this.setState" on an unmounted component. This is a no-op, ` +
 				`but it indicates a memory leak in your application. To fix, cancel all ` +
@@ -413,7 +413,7 @@ Component.prototype.forceUpdate = function(callback) {
 					getCurrentInternal()
 				)}`
 		);
-	} else if (this._internal._flags & MODE_UNMOUNTING) {
+	} else if (this._internal.flags & MODE_UNMOUNTING) {
 		console.warn(
 			`Can't call "this.forceUpdate" on an unmounted component. This is a no-op, ` +
 				`but it indicates a memory leak in your application. To fix, cancel all ` +

@@ -71,7 +71,7 @@ Component.prototype.forceUpdate = function(callback) {
 		// Set render mode so that we can differentiate where the render request
 		// is coming from. We need this because forceUpdate should never call
 		// shouldComponentUpdate
-		this._internal._flags |= FORCE_UPDATE;
+		this._internal.flags |= FORCE_UPDATE;
 		if (callback) addCommitCallback(this._internal, callback);
 		enqueueRender(this);
 	}
@@ -96,12 +96,12 @@ Component.prototype.render = Fragment;
 function rerenderComponent(component) {
 	let internal = component._internal;
 
-	if (~internal._flags & MODE_UNMOUNTING && internal._flags & DIRTY_BIT) {
+	if (~internal.flags & MODE_UNMOUNTING && internal.flags & DIRTY_BIT) {
 		let parentDom = getParentDom(internal);
 		let startDom =
-			(internal._flags & (MODE_HYDRATE | MODE_SUSPENDED)) ===
+			(internal.flags & (MODE_HYDRATE | MODE_SUSPENDED)) ===
 			(MODE_HYDRATE | MODE_SUSPENDED)
-				? internal._dom
+				? internal.dom
 				: getDomSibling(internal, 0);
 
 		const vnode = createVNode(
@@ -150,10 +150,10 @@ const defer = Promise.prototype.then.bind(Promise.resolve());
  */
 export function enqueueRender(c) {
 	if (
-		(!(c._internal._flags & DIRTY_BIT) &&
-			(c._internal._flags |= DIRTY_BIT) &&
+		(!(c._internal.flags & DIRTY_BIT) &&
+			(c._internal.flags |= DIRTY_BIT) &&
 			rerenderQueue.push(c) &&
-			!process._rerenderCount++) ||
+			!len++) ||
 		prevDebounce !== options.debounceRendering
 	) {
 		prevDebounce = options.debounceRendering;
@@ -163,11 +163,11 @@ export function enqueueRender(c) {
 
 /** Flush the render queue by rerendering all queued components */
 function process() {
-	while ((len = process._rerenderCount = rerenderQueue.length)) {
-		rerenderQueue.sort((a, b) => a._internal._depth - b._internal._depth);
+	while (len = rerenderQueue.length) {
+		rerenderQueue.sort((a, b) => a._internal.depth - b._internal.depth);
 		while (len--) {
 			rerenderComponent(rerenderQueue.shift());
 		}
 	}
 }
-let len = (process._rerenderCount = 0);
+let len = 0;

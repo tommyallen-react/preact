@@ -11,8 +11,8 @@ options._catchError = function(error, internal) {
 		let component;
 		let handler = internal;
 
-		for (; (handler = handler._parent); ) {
-			if ((component = handler._component) && component._childDidSuspend) {
+		for (; (handler = handler.parent); ) {
+			if ((component = handler.component) && component._childDidSuspend) {
 				// Don't call oldCatchError if we found a Suspense
 				return component._childDidSuspend(error, internal);
 			}
@@ -25,7 +25,7 @@ const oldUnmount = options.unmount;
 /** @type {(internal: import('./internal').Internal) => void} */
 options.unmount = function(internal) {
 	/** @type {import('./internal').Component} */
-	const component = internal._component;
+	const component = internal.component;
 	if (component && component._onResolve) {
 		component._onResolve();
 	}
@@ -34,9 +34,9 @@ options.unmount = function(internal) {
 	// update it's _flags so it appears to be of TYPE_ELEMENT, causing `unmount`
 	// to remove the DOM nodes that were awaiting hydration (which are stored on
 	// this internal's _dom property).
-	const wasHydrating = (internal._flags & MODE_HYDRATE) === MODE_HYDRATE;
+	const wasHydrating = (internal.flags & MODE_HYDRATE) === MODE_HYDRATE;
 	if (component && wasHydrating) {
-		internal._flags |= TYPE_ELEMENT;
+		internal.flags |= TYPE_ELEMENT;
 	}
 
 	if (oldUnmount) oldUnmount(internal);
@@ -65,7 +65,7 @@ Suspense.prototype = new Component();
  * @param {import('./internal').Internal} suspendingInternal The suspending component
  */
 Suspense.prototype._childDidSuspend = function(promise, suspendingInternal) {
-	const suspendingComponent = suspendingInternal._component;
+	const suspendingComponent = suspendingInternal.component;
 	if (suspendingComponent._onResolve != null) {
 		// This component has already been handled by a Suspense component. Do
 		// nothing
@@ -116,7 +116,7 @@ Suspense.prototype._childDidSuspend = function(promise, suspendingInternal) {
 	 * While in non-hydration cases the usual fallback -> component flow would occur.
 	 */
 	const wasHydrating =
-		(suspendingInternal._flags & MODE_HYDRATE) === MODE_HYDRATE;
+		(suspendingInternal.flags & MODE_HYDRATE) === MODE_HYDRATE;
 
 	if (!c._pendingSuspensionCount++ && !wasHydrating) {
 		this._parentDom = document.createElement('div');
@@ -175,7 +175,7 @@ Suspense.prototype.render = function(props, state) {
  * @returns {((unsuspend: () => void) => void)?}
  */
 export function suspended(internal) {
-	let component = internal._parent._component;
+	let component = internal.parent.component;
 	return component && component._suspended && component._suspended(internal);
 }
 

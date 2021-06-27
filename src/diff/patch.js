@@ -32,8 +32,8 @@ export function patch(
 	commitQueue,
 	startDom
 ) {
-	let dom = internal._dom;
-	let flags = internal._flags;
+	let dom = internal.dom;
+	let flags = internal.flags;
 
 	if (flags & TYPE_TEXT) {
 		if (newVNode !== internal.props) {
@@ -51,11 +51,11 @@ export function patch(
 	if (options._diff) options._diff(internal, newVNode);
 
 	if (flags & TYPE_ELEMENT) {
-		if (newVNode._vnodeId !== internal._vnodeId) {
+		if (newVNode._vnodeId !== internal.id) {
 			// @ts-ignore dom is a PreactElement here
 			patchDOMElement(dom, newVNode, internal, globalContext, commitQueue);
 			// Once we have successfully rendered the new VNode, copy it's ID over
-			internal._vnodeId = newVNode._vnodeId;
+			internal.id = newVNode._vnodeId;
 		}
 
 		if (options.diffed) options.diffed(internal);
@@ -101,7 +101,7 @@ export function patch(
 	} catch (e) {
 		// @TODO: assign a new VNode ID here? Or NaN?
 		// newVNode._vnodeId = 0;
-		internal._flags |= e.then ? MODE_SUSPENDED : MODE_ERRORED;
+		internal.flags |= e.then ? MODE_SUSPENDED : MODE_ERRORED;
 		options._catchError(e, internal);
 
 		return nextDomSibling;
@@ -131,9 +131,9 @@ export function patch(
 	if (options.diffed) options.diffed(internal);
 
 	// We successfully rendered this VNode, unset any stored hydration/bailout state:
-	internal._flags &= RESET_MODE;
+	internal.flags &= RESET_MODE;
 	// Once we have successfully rendered the new VNode, copy it's ID over
-	internal._vnodeId = newVNode._vnodeId;
+	internal.id = newVNode._vnodeId;
 
 	return nextDomSibling;
 }
@@ -151,7 +151,7 @@ export function patch(
 function patchDOMElement(dom, newVNode, internal, globalContext, commitQueue) {
 	let oldProps = internal.props,
 		newProps = (internal.props = newVNode.props),
-		isSvg = internal._flags & MODE_SVG,
+		isSvg = internal.flags & MODE_SVG,
 		i,
 		value,
 		tmp,
@@ -192,7 +192,7 @@ function patchDOMElement(dom, newVNode, internal, globalContext, commitQueue) {
 		if (!oldHtml || (value !== oldHtml.__html && value !== dom.innerHTML)) {
 			dom.innerHTML = value;
 		}
-		internal._children = null;
+		internal.children = null;
 	} else {
 		if (oldHtml) dom.innerHTML = '';
 
