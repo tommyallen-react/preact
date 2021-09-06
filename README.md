@@ -172,16 +172,3 @@ Become a sponsor and get your logo on our README on GitHub with a link to your s
 <a href="https://opencollective.com/preact/sponsor/29/website" target="_blank"><img src="https://opencollective.com/preact/sponsor/29/avatar.svg"></a>
 
 ---
-
-## License
-
-MIT
-
-
-
-[![Preact](https://i.imgur.com/YqCHvEW.gif)](https://preactjs.com)
-
-
-[preact/compat]: https://github.com/preactjs/preact/tree/master/compat
-[hyperscript]: https://github.com/dominictarr/hyperscript
-[DevTools]: https://github.com/preactjs/preact-devtools
